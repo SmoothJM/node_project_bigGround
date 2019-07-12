@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="../../favicon.ico">
+
+  <title>Test</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="./test.js">
+
+  </script>
+</head>
+
+<body>
+  <!-- <div class="progress">
+    <div class="progress-bar" id="dd">
+      <span class="sr-only">60% Complete</span>
+    </div>
+  </div> -->
+  <!--外层容器-->
+  <div id="wrapper" style="padding-left: 20%;padding-right:20%">
+    <div class="progress progress-striped active">
+      <div id="prog" class="progress-bar" aria-valuemin="0" aria-valuemax="100">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+    $().ready(function () {
+      var value = 0;
+      setInterval(function (e) {
+        if (value != 100) {
+          value = parseInt(value) + 1;
+          $("#prog").css("width", value + "%").text(value + "%");
+        }
+      }, 50);
+    });
+  </script>
+</body>
+
+</html>

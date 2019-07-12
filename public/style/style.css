@@ -1,0 +1,16 @@
+#mainPanel{
+    margin-top: 130px;
+}
+
+#btnOnly{
+    float: right;
+}
+.text_center{
+    text-align: center;
+}
+/* @media all and (max-width:989px){
+    #mainPanel{
+        width: 430px;
+        float:center;
+    }
+} */
