@@ -1,10 +1,13 @@
 const express = require('express');
 const session = require('express-session');
 const uuu = require('url');
+const path = require('path');
 const md5 = require('md5');
 const DB = require('./modules/db');
 const ObjectID = require('mongodb').ObjectID;
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
+const multiparty = require('multiparty');
+const fs = require('fs');
 const app = express();
 
 
@@ -12,6 +15,7 @@ app.set('view engine','ejs');
 app.set('views',__dirname+'/views');
 
 app.use(express.static('public'));
+app.use('/public',express.static('upload'));
 app.use(session({
     secret:'I am Jim',
     resave:false,
@@ -20,8 +24,8 @@ app.use(session({
         maxAge:1000*60*60*24
     }
 }));
-app.use(bodyParser.urlencoded({extended:false}));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended:false}));
+// app.use(bodyParser.json());
 app.use((req,res,next)=>{
     if(req.url!='/' && req.url!='/favicon.ico' && uuu.parse(req.url).pathname!='/doLogin'){
         if(req.session.username){
@@ -78,16 +82,36 @@ app.get('/add',(req,res)=>{
 });
 
 app.post('/doAdd',(req,res)=>{
-    DB.insert('items',req.body,(error,result)=>{
-        if(error) throw error;
-        if(result.result.n===1){
-            res.send("<script>location.href='/add';alert('添加成功！');</script>");
-        }else{
-            res.send("<script>location.href='/add';alert('添加失败！');</script>");
-        }
-       
+    //body-parser方式上传数据，但是图片无法真正上传到服务器，所以使用multiparty
+    // DB.insert('items',req.body,(error,result)=>{
+    //     if(error) throw error;
+    //     if(result.result.n===1){
+    //         res.send("<script>location.href='/add';alert('添加成功！');</script>");
+    //     }else{
+    //         res.send("<script>location.href='/add';alert('添加失败！');</script>");
+    //     }
+    // });
+
+    const form = new multiparty.Form();
+    form.uploadDir = 'public/upload';
+    form.parse(req, function(err, fields, files) {
+        if(err) throw err;
+        var imgPathSp = files.img[0].path.split("\\");
+        var imgPath = path.join(imgPathSp[1],imgPathSp[2]);
+        DB.insert('items',{
+            title:fields.title[0],
+            price:fields.price[0],
+            img:imgPath,
+            desc:fields.desc[0],
+        },(error,result)=>{
+            if(error) throw error;
+            if(result.result.n===1){
+                res.send("<script>location.href='/add';alert('添加成功！');</script>");
+            }else{
+                res.send("<script>location.href='/add';alert('添加失败！');</script>");
+            }
+        });
     });
-    
 });
 
 app.get('/list',(req,res)=>{
@@ -127,20 +151,52 @@ app.get('/edit/_id/:_id',(req,res)=>{
     });
 });
 app.post('/edit/_id/doEdit',(req,res)=>{
-    DB.update('items',{_id:ObjectID(req.body._id)},{
-        title:req.body.title,
-        price:req.body.price,
-        img:req.body.img,
-        desc:req.body.desc,
-    },(error,result)=>{
-        if(error) throw error;
-        if(result.result.n===1){
-            res.send("<script>location.href='/list';alert('更新成功！');</script>");
-        }else{
-            res.send("<script>location.href='/list';alert('更新失败！');</script>");
+    // DB.update('items',{_id:ObjectID(req.body._id)},{
+    //     title:req.body.title,
+    //     price:req.body.price,
+    //     img:req.body.img,
+    //     desc:req.body.desc,
+    // },(error,result)=>{
+    //     if(error) throw error;
+    //     if(result.result.n===1){
+    //         res.send("<script>location.href='/list';alert('更新成功！');</script>");
+    //     }else{
+    //         res.send("<script>location.href='/list';alert('更新失败！');</script>");
+    //     }
+    // });
+    const form = new multiparty.Form();
+    form.uploadDir = 'public/upload';
+    form.parse(req,(err,fields,files)=>{
+        if (err) throw err;
+        var imgPathSp = files.img[0].path.split('\\');
+        var imgPath = path.join(imgPathSp[1],imgPathSp[2]);
+        if(files.img[0].originalFilename){
+            var setData = {
+                title:fields.title[0],
+                price:fields.price[0],
+                img:imgPath,
+                desc:fields.desc[0]
+            }
+        }else {
+            var setData = {
+                title:fields.title[0],
+                price:fields.price[0],
+                desc:fields.desc[0]
+            }
+            fs.unlink('public\\'+imgPath,(err) => {
+                if (err) throw err;
+                console.log('public\\'+imgPath);
+              });
         }
+        DB.update('items',{_id:ObjectID(fields._id[0])},setData,(error,result)=>{
+            if(error) throw error;
+            if(result.result.n===1){
+                res.send("<script>location.href='/list';alert('更新成功！');</script>");
+            }else{
+                res.send("<script>location.href='/list';alert('更新失败！');</script>");
+            }
+        });
     });
-    // res.send(req.body);
 });
 app.get('/logout',(req,res)=>{
     res.render('login',{warning:'',errorClass:''});

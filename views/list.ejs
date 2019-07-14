@@ -72,7 +72,7 @@
                                 <tr>
                                     <td><%=items[i].title%></td>
                                     <td>￥<%=items[i].price%></td>
-                                    <td><%=items[i].img%></td>
+                                    <td><img id="img01" src="<%=items[i].img%>" alt="null"></td>
                                     <td><%=items[i].desc%></td>
                                     <td class="text_center"><a href="edit/_id/<%=items[i]._id%>">修改</a></td>
                                     <td class="text_center"><a id="del" href="#" onclick="doDelete('<%=items[i]._id%>')">删除</a></td>

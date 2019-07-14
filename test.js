@@ -1,6 +1,6 @@
-(function(window){
-    var i=0;
-    setInterval(()=>{
-    document.getElementsByID('dd').css('width',i+'%');
-  },1000);
-  })(window);
+var str = 'public\\upload\\v87WJMSAcsCGeAgis4jFOIH7.ico';
+var arr = str.split("\\");
+console.log(arr);
+const path = require('path');
+str = path.join(arr[1],arr[2]);
+console.log(str);

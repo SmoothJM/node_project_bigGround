@@ -8,9 +8,8 @@
 .text_center{
     text-align: center;
 }
-/* @media all and (max-width:989px){
-    #mainPanel{
-        width: 430px;
-        float:center;
-    }
-} */
+
+#img01{
+   width: 50px;
+   height: 50px; 
+}
