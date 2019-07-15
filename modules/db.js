@@ -23,7 +23,7 @@ module.exports.find = function(collectionName,condition,cal){
 module.exports.insert = function(collectionName,dataInsert,cal){
     _connect((error,dbo)=>{
         if(error) throw error;
-        dbo.collection(collectionName).insert(dataInsert,(err,result)=>{
+        dbo.collection(collectionName).insertOne(dataInsert,(err,result)=>{
             if (err) throw err;
             cal(err,result);
         });
